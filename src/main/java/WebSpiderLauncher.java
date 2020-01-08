@@ -1,9 +1,9 @@
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
+import com.gargoylesoftware.htmlunit.html.DomAttr;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -19,27 +19,25 @@ public class WebSpiderLauncher {
         client.getOptions().setCssEnabled(false);
         client.getOptions().setUseInsecureSSL(true);
 
-        StringBuilder stringBuilder = new StringBuilder();
+        List<String> urls = new ArrayList<String>();
 
         try {
             HtmlPage page = client.getPage(baseUrl);
-//            List<HtmlElement> items = (List<HtmlElement>) page.getByXPath("//li[@class='product-item--row js_item_root ']");
-            List<HtmlElement> items = (List<HtmlElement>) page.getByXPath("//div[@class='product-title--inline']/a");
+            List<DomAttr> items = (List<DomAttr>) page.getByXPath("//*[@id='js_items_content']/li/div/div/div/a/@href");
             if (items.isEmpty()) {
                 System.out.println("No items found");
             } else {
-                for (HtmlElement htmlItem: items) {
-//                    System.out.println("htmlItem: " + htmlItem.toString());
-                    HtmlAnchor itemAnchor = ((HtmlAnchor) htmlItem.getFirstByXPath("//div[@class='product-title--inline']/a"));
-                    String path = itemAnchor.getHrefAttribute();
-                    stringBuilder.append(baseSecondUrl);
-                    stringBuilder.append(path);
-
-                    System.out.println(stringBuilder.toString());
+                for (DomAttr item: items) {
+                    urls.add(baseSecondUrl + item.getValue());
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.info(e.getMessage());
+        }
+
+        System.out.println("***** URLS *****");
+        for (String item: urls) {
+            System.out.println(item);
         }
 
     }
