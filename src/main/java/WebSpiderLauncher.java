@@ -13,6 +13,9 @@ public class WebSpiderLauncher {
     private static final Logger logger = Logger.getLogger(WebSpiderLauncher.class.getName());
     public static final String baseUrl = "https://www.bol.com/nl/l/tablets-accessoires/N/18147/?promo=electronics_360__A_42602-42621-tablets-&-accessoires_8_";
     public static final String baseSecondUrl = "https://www.bol.com";
+    public static final String baseThirdUrl = "https://www.bol.com/nl/l/boeken/N/8299/?page=";
+    public static final List<String> urls = new ArrayList<String>();
+    public static final List<Item> books = new ArrayList<Item>();
 
     public static void main(String[] args) {
         WebClient client = new WebClient();
@@ -20,27 +23,34 @@ public class WebSpiderLauncher {
         client.getOptions().setCssEnabled(false);
         client.getOptions().setUseInsecureSSL(true);
 
+        for (int i = 1; i < 500; i++) {
+            urls.add(baseThirdUrl + i);
+        }
+
         try {
-            HtmlPage page = client.getPage(baseUrl);
-            List<DomAttr> titles = (List<DomAttr>) page.getByXPath("//*/a[contains(@class, 'product-image product-image--list px_list_page_product_click')]/img/@alt");
-            List<DomAttr> prices = (List<DomAttr>) page.getByXPath("//*[@id='js_items_content']/li/div/wsp-buy-block/div/section/div/div/meta/@content");
-            List<DomAttr> urls = (List<DomAttr>) page.getByXPath("//*[@id='js_items_content']/li/div/div/a[contains(@class, 'hit-area__link medium--is-hidden')]/@href");
+            for (String url: urls) {
+                HtmlPage page = client.getPage(url);
+                List<DomAttr> titles = (List<DomAttr>) page.getByXPath("//*/a[contains(@class, 'product-image product-image--list px_list_page_product_click')]/img/@alt");
+                List<DomAttr> prices = (List<DomAttr>) page.getByXPath("//*[@id='js_items_content']/li/div/wsp-buy-block/div/section/div/div/meta/@content");
+                List<DomAttr> urls = (List<DomAttr>) page.getByXPath("//*[@id='js_items_content']/li/div/div/a[contains(@class, 'hit-area__link medium--is-hidden')]/@href");
 
 
-            if (titles.size() == prices.size() && prices.size() == urls.size()) {
-                List<Item> items = new ArrayList<Item>(titles.size());
-                for (int i = 0; i < titles.size(); i++) {
-                    Item item = new Item();
-                    item.setTitle(titles.get(i).getTextContent());
-                    item.setPrice(Double.parseDouble(prices.get(i).getValue()));
-                    item.setUrl(baseSecondUrl + urls.get(i).getValue());
-                    items.add(item);
-                }
+                if (titles.size() == prices.size() && prices.size() == urls.size()) {
+                    List<Item> items = new ArrayList<Item>(titles.size());
+                    for (int i = 0; i < titles.size(); i++) {
+                        Item item = new Item();
+                        item.setTitle(titles.get(i).getTextContent());
+                        item.setPrice(Double.parseDouble(prices.get(i).getValue()));
+                        item.setUrl(baseSecondUrl + urls.get(i).getValue());
+                        items.add(item);
+                    }
 
-                for (Item item: items) {
-                    System.out.println(item.toString());
+                    for (Item item: items) {
+                        System.out.println(item.toString());
+                    }
                 }
             }
+
         } catch (IOException e) {
             logger.info(e.getMessage());
         }
