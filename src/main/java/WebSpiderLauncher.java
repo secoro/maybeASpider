@@ -10,8 +10,8 @@ import java.util.logging.Logger;
 public class WebSpiderLauncher {
 
     private static final Logger logger = Logger.getLogger(WebSpiderLauncher.class.getName());
-    public static final String baseUrl = "https://www.bol.com/nl/l/boeken/N/8299/?bltgh=s-iDlYBGQPgvgTt07k5PWA.2_3_4.5.CategoryImage";
-    public static final String baseSecondUrl = "https://www.bol.com";
+    public static final String baseUrl = "https://www.ticketswap.nl/event/zwarte-cross-2020/vrijdag/5bebf0e9-728e-4bee-9359-0d414a2c9e35/1468082";
+    public static final String baseSecondUrl = "https://www.ticketswap.nl";
 
     public static void main(String[] args) {
         WebClient client = new WebClient();
@@ -23,7 +23,9 @@ public class WebSpiderLauncher {
 
         try {
             HtmlPage page = client.getPage(baseUrl);
-            List<DomAttr> items = (List<DomAttr>) page.getByXPath("//*[@id='js_items_content']/li/div/div/div/a/@href");
+            List<DomAttr> items = (List<DomAttr>) page.getByXPath("//*[@id='tickets']/div/ul/div/a/@href");
+            ////*[@id='js_items_content'/li/div/div/div/a/@href]
+            ////*[@id="__next"]
             if (items.isEmpty()) {
                 System.out.println("No items found");
             } else {
