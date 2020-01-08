@@ -10,8 +10,12 @@ import java.util.logging.Logger;
 public class WebSpiderLauncher {
 
     private static final Logger logger = Logger.getLogger(WebSpiderLauncher.class.getName());
-    public static final String baseUrl = "https://www.ticketswap.nl/event/zwarte-cross-2020/vrijdag/5bebf0e9-728e-4bee-9359-0d414a2c9e35/1468082";
+    public static final String baseUrl = "https://www.ticketswap.nl/event/karnaval-festival-2020/sunday-tickets/6c2e638c-0f9e-4b7d-a678-4e158c15bafb/1463463";
     public static final String baseSecondUrl = "https://www.ticketswap.nl";
+
+    public static final int numOfTickets = 0;
+    public static boolean isAlive = true;
+
 
     public static void main(String[] args) {
         WebClient client = new WebClient();
@@ -23,22 +27,24 @@ public class WebSpiderLauncher {
 
         try {
             HtmlPage page = client.getPage(baseUrl);
-            List<DomAttr> items = (List<DomAttr>) page.getByXPath("//*[@id='tickets']/div/ul/div/a/@href");
-            ////*[@id='js_items_content'/li/div/div/div/a/@href]
-            ////*[@id="__next"]
-            if (items.isEmpty()) {
-                System.out.println("No items found");
-            } else {
-                for (DomAttr item: items) {
+            List<DomAttr> tickets = new ArrayList<DomAttr>();
+
+            while (tickets.isEmpty()) {
+                page.refresh();
+                tickets = (List<DomAttr>) page.getByXPath("//div[preceding-sibling::h2[contains(., 'Aangeboden')]and following-sibling::h2[contains(., 'Verkocht')]]/ul/div/a/@href");
+
+                for (DomAttr item : tickets) {
                     urls.add(baseSecondUrl + item.getValue());
                 }
+                break;
+
             }
         } catch (IOException e) {
             logger.info(e.getMessage());
         }
 
         System.out.println("***** URLS *****");
-        for (String item: urls) {
+        for (String item : urls) {
             System.out.println(item);
         }
 
